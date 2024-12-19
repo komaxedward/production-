@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>批量入库</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap.min.css') }}">
+    <style>
+        body {
+            background-color: #333;
+            color: white;
+        }
+        .container {
+            margin-top: 50px;
+        }
+        .btn-custom {
+            background-color: #28a745;
+            color: white;
+        }
+        .product-entry {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .product-entry label {
+            margin-bottom: 0;
+        }
+        .product-entry input {
+            flex: 1;
+        }
+        .product-image {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>批量入库</h2>
+        <form method="POST" id="productForm">
+            <div id="productInputs">
+                <div class="product-entry mb-3">
+                    <label>产品号码:</label>
+                    <input type="text" name="product_code[]" class="form-control product-code">
+                    <img src="" alt="Product Image" class="product-image">
+                    <label>数量:</label>
+                    <input type="number" name="quantity[]" class="form-control">
+                    <label>消耗原材料数量:</label>
+                    <input type="number" name="material_quantity[]" class="form-control">
+                </div>
+            </div>
+            <button type="button" class="btn btn-custom mb-3" onclick="addProductInput()">增加选项</button>
+            <div class="d-flex justify-content-end">
+                <button type="button" class="btn btn-custom me-2" onclick="confirmSubmission()">OK</button>
+                <button type="button" class="btn btn-secondary">Cancel</button>
+            </div>
+        </form>
+    </div>
+    <script src="{{ url_for('static', filename='bootstrap.bundle.min.js') }}"></script>
+    <script>
+        function addProductInput() {
+            const productInputs = document.getElementById('productInputs');
+            const newEntry = document.createElement('div');
+            newEntry.classList.add('product-entry', 'mb-3');
+            newEntry.innerHTML = `
+                <label>产品号码:</label>
+                <input type="text" name="product_code[]" class="form-control product-code">
+                <img src="" alt="Product Image" class="product-image">
+                <label>数量:</label>
+                <input type="number" name="quantity[]" class="form-control">
+                <label>消耗原材料数量:</label>
+                <input type="number" name="material_quantity[]" class="form-control">
+            `;
+            productInputs.appendChild(newEntry);
+            attachImageListener(newEntry.querySelector('.product-code'));
+        }
+
+        function attachImageListener(input) {
+            input.addEventListener('input', function() {
+                const productCode = this.value;
+                const image = this.closest('.product-entry').querySelector('.product-image');
+                if (productCode) {
+                    image.src = `/static/images/${productCode}.png`;
+                } else {
+                    image.src = '';
+                }
+            });
+        }
+
+        document.querySelectorAll('.product-code').forEach(attachImageListener);
+
+        function confirmSubmission() {
+            const entries = document.querySelectorAll('.product-entry');
+            let confirmationMessage = '请确认以下信息:\n\n';
+            entries.forEach(entry => {
+                const productCode = entry.querySelector('.product-code').value;
+                const quantity = entry.querySelector('input[name="quantity[]"]').value;
+                const materialQuantity = entry.querySelector('input[name="material_quantity[]"]').value;
+
+                if (!productCode || !quantity || !materialQuantity) {
+                    alert('请输入所有产品信息。');
+                    return;
+                }
+
+                confirmationMessage += `产品号码: ${productCode}, 数量: ${quantity}, 消耗原材料数量: ${materialQuantity}\n\n`;
+            });
+
+            const confirmation = confirm(confirmationMessage + '确认入库吗？');
+            if (confirmation) {
+                document.getElementById('productForm').submit();
+            }
+        }
+    </script>
+</body>
+</html> 

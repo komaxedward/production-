@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>批量原材料入库</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap.min.css') }}">
+    <style>
+        body {
+            background-color: #333;
+            color: white;
+        }
+        .container {
+            margin-top: 50px;
+        }
+        .btn-custom {
+            background-color: #28a745;
+            color: white;
+        }
+        .material-entry {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .material-entry label {
+            margin-bottom: 0;
+        }
+        .material-entry input {
+            flex: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>批量原材料入库</h2>
+        <form method="POST" id="materialForm">
+            <div id="materialInputs">
+                <div class="material-entry mb-3">
+                    <label>原材料号码:</label>
+                    <input type="text" name="material_code[]" class="form-control material-code">
+                    <label>原材料名称:</label>
+                    <input type="text" name="material_name[]" class="form-control material-name" readonly>
+                    <label>原材料类型:</label>
+                    <input type="text" name="material_type[]" class="form-control material-type" readonly>
+                    <label>数量:</label>
+                    <input type="number" name="quantity[]" class="form-control">
+                </div>
+            </div>
+            <button type="button" class="btn btn-custom mb-3" onclick="addMaterialInput()">增加选项</button>
+            <div class="d-flex justify-content-end">
+                <button type="button" class="btn btn-custom me-2" onclick="confirmSubmission()">OK</button>
+                <button type="button" class="btn btn-secondary">Cancel</button>
+            </div>
+        </form>
+    </div>
+    <script src="{{ url_for('static', filename='bootstrap.bundle.min.js') }}"></script>
+    <script>
+        function addMaterialInput() {
+            const materialInputs = document.getElementById('materialInputs');
+            const newEntry = document.createElement('div');
+            newEntry.classList.add('material-entry', 'mb-3');
+            newEntry.innerHTML = `
+                <label>原材料号码:</label>
+                <input type="text" name="material_code[]" class="form-control material-code">
+                <label>原材料名称:</label>
+                <input type="text" name="material_name[]" class="form-control material-name" readonly>
+                <label>原材料类型:</label>
+                <input type="text" name="material_type[]" class="form-control material-type" readonly>
+                <label>数量:</label>
+                <input type="number" name="quantity[]" class="form-control">
+            `;
+            materialInputs.appendChild(newEntry);
+            attachInputListeners(newEntry.querySelector('.material-code'));
+        }
+
+        function attachInputListeners(input) {
+            input.addEventListener('input', function() {
+                const materialCode = this.value;
+                const entry = this.closest('.material-entry');
+                if (materialCode) {
+                    fetch(`/get_material/${materialCode}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            entry.querySelector('.material-name').value = data.material_name || '';
+                            entry.querySelector('.material-type').value = data.material_type || '';
+                        });
+                } else {
+                    entry.querySelector('.material-name').value = '';
+                    entry.querySelector('.material-type').value = '';
+                }
+            });
+        }
+
+        document.querySelectorAll('.material-code').forEach(attachInputListeners);
+
+        function confirmSubmission() {
+            const entries = document.querySelectorAll('.material-entry');
+            let confirmationMessage = '请确认以下信息:\n\n';
+            entries.forEach(entry => {
+                const materialCode = entry.querySelector('.material-code').value;
+                const materialName = entry.querySelector('.material-name').value;
+                const materialType = entry.querySelector('.material-type').value;
+                const quantity = entry.querySelector('input[name="quantity[]"]').value;
+
+                if (!materialCode || !quantity) {
+                    alert('请输入所有原材料号码和数量。');
+                    return;
+                }
+
+                confirmationMessage += `原材料号码: ${materialCode}\n原材料名称: ${materialName}\n原材料类型: ${materialType}\n数量: ${quantity}\n\n`;
+            });
+
+            const confirmation = confirm(confirmationMessage + '确认入库吗？');
+            if (confirmation) {
+                document.getElementById('materialForm').submit();
+            }
+        }
+    </script>
+</body>
+</html> 
