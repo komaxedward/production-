@@ -5,3 +5,4 @@ pandas
 werkzeug
 pytz
 xlsxwriter
+psycopg2
