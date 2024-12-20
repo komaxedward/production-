@@ -10,7 +10,7 @@ from functools import wraps
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your_secret_key'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://inventory_95cp_user:d3PMapaPFsDCDreuAKfxQlIX9DhagDsY@dpg-ctifm9ggph6c73864kn0-a.oregon-postgres.render.com/inventory_95cp'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///inventory.db'
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=30)
 db = SQLAlchemy(app)
 
