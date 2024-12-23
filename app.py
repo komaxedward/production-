@@ -11,7 +11,7 @@ from functools import wraps
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your_secret_key'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://db_gdwm_user:h7vU2GvuAKxrNuVi5VrjxDsMJ3SbAmnl@dpg-ctkbdd2j1k6c73cnlga0-a.oregon-postgres.render.com/db_gdwm'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://inventory_db_eumg_user:kwmJInxZnrEBwfBrlxF96LjUCoAFYtj5@dpg-ctkg2ibqf0us739hnutg-a/inventory_db_eumg'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=30)
 db = SQLAlchemy(app)
